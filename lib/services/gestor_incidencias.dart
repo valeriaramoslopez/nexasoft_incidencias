@@ -4,17 +4,18 @@ import '../model/incidencia.dart';
 class GestorIncidencias {
   final AlmacenLocal datos = AlmacenLocal();
   List<Incidencia> incidencias = [];
-  int cantidadPendientes = 0;
 
   Future<void> iniciar() async {
     incidencias = await datos.leer();
-    cantidadPendientes =
-        incidencias.where((x) => x.estado == 'Pendiente').length;
   }
 
   List<Incidencia> buscar(String texto) {
-    if (texto.trim().isEmpty) return incidencias;
-    return incidencias.where((x) => x.titulo.contains(texto)).toList();
+    final consulta = texto.trim().toLowerCase();
+    if (consulta.isEmpty) return incidencias; //resolver el BUG002 se leen los titulos en minuscula
+    return incidencias.where((x){
+      final tituloMin = x.titulo.toLowerCase();
+      return tituloMin.contains(consulta);
+    }).toList();
   }
 
   Incidencia? porId(String id) {
@@ -25,17 +26,17 @@ class GestorIncidencias {
   }
 
   int contar(String estado) {
-    if (estado == 'Pendiente') return cantidadPendientes;
-    return incidencias.where((x) => x.estado == estado).length;
+    return incidencias.where((x) => x.estado == estado).length; //asi se resuelve el BUG003 contando directamente de la lista
   }
 
   Future<void> cambiarEstado(String id, String estado) async {
     for (var i = 0; i < incidencias.length; i++) {
       if (incidencias[i].id == id) {
-        incidencias[i].estado = estado;
+        incidencias[i].estado = estado; //problema de carga
         break;
       }
     }
+    await datos.guardar(incidencias); //arreglo para el BUG001
   }
 
   Future<void> crear(String titulo, String descripcion, String cliente,
@@ -50,7 +51,6 @@ class GestorIncidencias {
       fecha: DateTime.now().toIso8601String().split('T').first,
     );
     incidencias.insert(0, nuevo);
-    cantidadPendientes++;
     await datos.guardar(incidencias);
   }
 
