@@ -190,6 +190,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                               Text(item.estado, style: TextStyle(
                                                 color: colorEstado(item.estado), fontWeight: FontWeight.bold,
                                               )),
+                                              Text('${item.prioridad}'),
                                             ],
                                           ),
                                         ),

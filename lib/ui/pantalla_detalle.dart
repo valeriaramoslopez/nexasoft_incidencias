@@ -70,12 +70,25 @@ class _PantallaDetalleState extends State<PantallaDetalle> {
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: item.estado,
+                      value: ['Pendiente', 'En proceso', 'Resuelta'].contains(item.estado) ? item.estado : null,
                       decoration: const InputDecoration(labelText: 'Estado actual', border: OutlineInputBorder()),
                       items: ['Pendiente', 'En proceso', 'Resuelta']
                           .map((v) => DropdownMenuItem(value: v, child: Text(v)))
                           .toList(),
-                      onChanged: guardando ? null : cambiar,
+                      onChanged: guardando ? null : (valor){
+                        if(valor != null) widget.gestor.cambiarEstado(widget.id, valor);
+                      }
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: ['Baja', 'Media', 'Alta'].contains(item.prioridad) ? item.prioridad : null,
+                      decoration: const InputDecoration(labelText: 'Prioridad actual', border: OutlineInputBorder()),
+                      items: ['Baja', 'Media', 'Alta']
+                          .map((v) => DropdownMenuItem(value: v, child: Text(v)))
+                          .toList(),
+                      onChanged: guardando ? null : (valor){
+                        if(valor != null) widget.gestor.cambiarPrioridad(widget.id, valor);
+                      }
                     ),
                     if (guardando) const Padding(
                       padding: EdgeInsets.only(top: 12), child: LinearProgressIndicator(),
