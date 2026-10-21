@@ -9,12 +9,14 @@ class GestorIncidencias {
     incidencias = await datos.leer();
   }
 
-  List<Incidencia> buscar(String texto) {
+  List<Incidencia> buscar(String texto, {String? estado, String? prioridad}) {
     final consulta = texto.trim().toLowerCase();
-    if (consulta.isEmpty) return incidencias; //resolver el BUG002 se leen los titulos en minuscula
+    
     return incidencias.where((x){
-      final tituloMin = x.titulo.toLowerCase();
-      return tituloMin.contains(consulta);
+      final coincideTexto = consulta.isEmpty || x.titulo.toLowerCase().contains(consulta);
+      final coincideEstado = estado == null || estado == 'Todos' || x.estado == estado;
+      final coincidePrioridad = prioridad == null || prioridad == 'Todas' || x.prioridad == prioridad;
+      return coincideTexto && coincideEstado && coincidePrioridad;
     }).toList();
   }
 
